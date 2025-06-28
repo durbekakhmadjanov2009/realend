@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="telegram:web-app" content="true">
+    <meta name="theme-color" content="#ffffff">
+    <title>Professional CV Yaratuvchi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            color: #1f2937;
+            transition: background 0.3s, color 0.3s;
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #f9fafb;
+        }
+        .dark-mode .bg-white { background: #1f2937 !important; color: #f9fafb !important; }
+        .dark-mode .text-gray-600 { color: #d1d5db !important; }
+        .dark-mode .bg-gray-100 { background: #111827 !important; }
+        .dark-mode .customization-panel { background: #374151 !important; }
+        .dark-mode .preset-option { background: #4b5563 !important; }
+        .dark-mode .preset-option:hover { background: #6b7280 !important; }
+        .dark-mode .modal-content { background: #374151 !important; }
+        .cv-template {
+            width: 100%;
+            max-width: 595px;
+            height: auto;
+            min-height: 842px;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+            font-size: 12px;
+            box-sizing: border-box;
+            transform-origin: top center;
+        }
+        .cv-header {
+            width: 100%;
+            min-height: 120px;
+            box-sizing: border-box;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .cv-body {
+            width: 100%;
+            min-height: calc(842px - 120px);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .cv-left, .cv-right {
+            box-sizing: border-box;
+            padding: 16px;
+            overflow: hidden;
+        }
+        .cv-template.one-column .cv-body {
+            flex-direction: column;
+        }
+        .cv-template.one-column .cv-left, .cv-template.one-column .cv-right {
+            width: 100%;
+        }
+        .cv-template.two-column .cv-body {
+            flex-direction: row;
+        }
+        .cv-template.two-column .cv-left {
+            width: 40%;
+            border-right: 1px solid #e5e7eb;
+        }
+        .cv-template.two-column .cv-right {
+            width: 60%;
+        }
+        .cv-section.dragging {
+            opacity: 0.6;
+            border: 2px dashed #3b82f6;
+        }
+        .pattern-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .pattern-top { top: 0; }
+        .pattern-bottom { bottom: 0; transform: rotate(180deg); }
+        .cv-section p, .cv-section div {
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .cv-contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .cv-contact-item i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .cv-contact-item div {
+            flex-grow: 1;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .cv-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        button.btn {
+            padding: 12px 18px;
+            font-size: 15px;
+            touch-action: manipulation;
+        }
+        @media (max-width: 768px) {
+            .cv-template {
+                width: 100%;
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+            .cv-body {
+                flex-direction: column;
+                height: auto;
+            }
+            .cv-left, .cv-right {
+                width: 100%;
+                border-right: none;
+            }
+            .cv-contact-item {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .container {
+                padding: 0 10px;
+            }
+            button.btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+            input.form-control, textarea.form-control, select.form-select {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            .cv-template {
+                transform: scale(0.65);
+            }
+            .cv-header h1 {
+                font-size: 14px;
+            }
+            .cv-header h2 {
+                font-size: 11px;
+            }
+            .cv-section-title {
+                font-size: 12px;
+            }
+            .cv-section p, .cv-section div {
+                font-size: 10px;
+            }
+            button.btn {
+                padding: 12px;
+                font-size: 15px;
+            }
+            input.form-control, textarea.form-control, select.form-select {
+                font-size: 13px;
+                padding: 8px;
+            }
+        }
+        .loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            z-index: 9999;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: none; }
+        }
+        .customization-panel {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .color-picker {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .preset-option {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .preset-option:hover {
+            background: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-4 max-w-7xl">
+        <header class="text-center mb-6 bg-white p-4 rounded-lg shadow-lg fade-in">
+            <div class="flex justify-end mb-4">
+                <button id="toggleDarkMode" class="btn btn-outline-secondary">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-600 mb-2">Professional CV Yaratuvchi</h1>
+            <p class="text-gray-600">Zamonaviy va moslashtirilgan CV-ni osongina yarating! (28.06.2025)</p>
+        </header>
+        <section class="bg-white p-4 rounded-lg shadow-lg fade-in">
+            <h2 class="text-xl font-semibold text-blue-600 mb-4">Ma'lumotlarni Kiriting</h2>
+            <div id="successAlert" class="alert alert-success d-none" role="alert">
+                CV muvaffaqiyatli yaratildi!
+            </div>
+            <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                Iltimos, barcha majburiy maydonlarni to'ldiring!
+            </div>
+            <div id="form-sections">
+                <div id="basic-section" class="form-section">
+                    <div class="mb-4">
+                        <label for="fullName" class="form-label">To'liq Ism *</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Familiya Ism Sharif" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="jobTitle" class="form-label">Lavozim *</label>
+                        <input type="text" id="jobTitle" class="form-control" placeholder="Ishlagan lavozimingiz" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="summary" class="form-label">Qisqacha ma'lumot</label>
+                        <textarea id="summary" class="form-control" placeholder="O'zingiz haqingizda qisqacha..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="photo" class="form-label">Profil rasmi (ixtiyoriy)</label>
+                        <input type="file" id="photo" class="form-control" accept="image/jpeg,image/png">
+                    </div>
+                    <div class="flex justify-end">
+                        <button class="btn btn-primary" id="nextToExperience">Keyingi</button>
+                    </div>
+                </div>
+                <div id="experience-section" class="form-section d-none">
+                    <div id="experience-fields">
+                        <div class="experience-item mb-4" data-id="exp-0">
+                            <div class="mb-3">
+                                <label class="form-label">Lavozim *</label>
+                                <input type="text" class="exp-position form-control" placeholder="Masalan: Dasturchi" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Korxona *</label>
+                                <input type="text" class="exp-company form-control" placeholder="Korxona nomi" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sana *</label>
+                                <input type="text" class="exp-date form-control" placeholder="Masalan: 2020 - 2023" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tavsif</label>
+                                <textarea class="exp-description form-control" placeholder="Ish tajribangiz haqida..."></textarea>
+                            </div>
+                            <button class="btn btn-danger btn-sm remove-experience"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <button class="btn btn-success btn-sm" id="add-experience"><i class="fas fa-plus"></i> Qo'shish</button>
+                    <div class="flex justify-between mt-3">
+                        <button class="btn btn-secondary" id="backToBasic">Orqaga</button>
+                        <button class="btn btn-primary" id="nextToEducation">Keyingi</button>
+                    </div>
+                </div>
+                <div id="education-section" class="form-section d-none">
+                    <div id="education-fields">
+                        <div class="education-item mb-4" data-id="edu-0">
+                            <div class="mb-3">
+                                <label class="form-label">Ta'lim darajasi *</label>
+                                <input type="text" class="edu-degree form-control" placeholder="Masalan: Bakalavr" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">O'quv muassasasi *</label>
+                                <input type="text" class="edu-institution form-control" placeholder="Universitet nomi" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sana *</label>
+                                <input type="text" class="edu-date form-control" placeholder="Masalan: 2016 - 2020" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tavsif (ixtiyoriy)</label>
+                                <textarea class="edu-description form-control" placeholder="Qo'shimcha ma'lumotlar..."></textarea>
+                            </div>
+                            <button class="btn btn-danger btn-sm remove-education"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <button class="btn btn-success btn-sm" id="add-education"><i class="fas fa-plus"></i> Qo'shish</button>
+                    <div class="flex justify-between mt-3">
+                        <button class="btn btn-secondary" id="backToExperience">Orqaga</button>
+                        <button class="btn btn-primary" id="nextToSkills">Keyingi</button>
+                    </div>
+                </div>
+                <div id="skills-section" class="form-section d-none">
+                    <div class="mb-4">
+                        <label class="form-label">Professional ko'nikmalar *</label>
+                        <div id="skill-fields">
+                            <div class="skill-item flex gap-3 mb-3 items-center" data-id="skill-0">
+                                <input type="text" class="skill-name form-control flex-1" placeholder="Ko'nikma nomi" required>
+                                <select class="skill-level form-select w-1/3">
+                                    <option value="beginner">Boshlang'ich</option>
+                                    <option value="intermediate">O'rta</option>
+                                    <option value="advanced">Yuqori</option>
+                                    <option value="expert">Expert</option>
+                                </select>
+                                <button class="btn btn-danger btn-sm remove-skill"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-sm" id="add-skill"><i class="fas fa-plus"></i> Qo'shish</button>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Biladigan tillar</label>
+                        <div id="language-fields">
+                            <div class="language-item flex gap-3 mb-3 items-center" data-id="lang-0">
+                                <input type="text" class="lang-name form-control flex-1" placeholder="Til nomi">
+                                <select class="lang-level form-select w-1/3">
+                                    <option value="beginner">Boshlang'ich</option>
+                                    <option value="intermediate">O'rta</option>
+                                    <option value="advanced">Yuqori</option>
+                                    <option value="native">Ona tili</option>
+                                </select>
+                                <button class="btn btn-danger btn-sm remove-language"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-sm" id="add-language"><i class="fas fa-plus"></i> Qo'shish</button>
+                    </div>
+                    <div class="mb-4">
+                        <label for="contact-email" class="form-label">Elektron pochta *</label>
+                        <input type="email" id="contact-email" class="form-control" placeholder="email@example.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="contact-phone" class="form-label">Telefon raqam *</label>
+                        <input type="text" id="contact-phone" class="form-control" placeholder="+998901234567" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="contact-address" class="form-label">Manzil</label>
+                        <input type="text" id="contact-address" class="form-control" placeholder="Shahar, tuman">
+                    </div>
+                    <div class="flex justify-between mt-3">
+                        <button class="btn btn-secondary" id="backToEducation">Orqaga</button>
+                        <button class="btn btn-primary" id="nextToCustomize">Keyingi</button>
+                    </div>
+                </div>
+                <div id="customize-section" class="form-section d-none">
+                    <div class="customization-panel">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold mb-2">Preset Dizaynlar</h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="preset-option" data-preset="professional">Professional</div>
+                                <div class="preset-option" data-preset="minimal">Minimal</div>
+                                <div class="preset-option" data-preset="vibrant">Vibrant</div>
+                                <div class="preset-option" data-preset="elegant">Elegant</div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold mb-2">Format</h3>
+                            <select id="layout-format" class="form-select">
+                                <option value="two-column">Ikki Ustunli</option>
+                                <option value="one-column">Bir Ustunli</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold mb-2">Matn Sozlamalari</h3>
+                            <div class="mb-2">
+                                <label class="form-label">Shrift Turi</label>
+                                <select id="font-family" class="form-select">
+                                    <option value="Inter">Inter</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Roboto">Roboto</option>
+                                    <option value="Georgia">Georgia</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Shrift O'lchami (px)</label>
+                                <input type="number" id="font-size" class="form-control" value="12" min="8" max="20">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Matn Rangi</label>
+                                <input type="color" id="font-color" class="color-picker" value="#000000">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold mb-2">Fon Sozlamalari</h3>
+                            <div class="mb-2">
+                                <label class="form-label">Umumiy Fon</label>
+                                <input type="color" id="bg-color" class="color-picker" value="#ffffff">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Header Foni</label>
+                                <input type="color" id="header-bg-color" class="color-picker" value="#2563eb">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold mb-2">Patternlar</h3>
+                            <div class="mb-2">
+                                <label class="form-label">Yuqori Pattern</label>
+                                <select id="top-pattern" class="form-select">
+                                    <option value="">Yo'q</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/double-bubble.png)">Bubble</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/wave.png)">Wave</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/diamond.png)">Diamond</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Pastki Pattern</label>
+                                <select id="bottom-pattern" class="form-select">
+                                    <option value="">Yo'q</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/double-bubble.png)">Bubble</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/wave.png)">Wave</option>
+                                    <option value="url(https://www.toptal.com/designers/subtlepatterns/uploads/diamond.png)">Diamond</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-3">
+                        <button class="btn btn-secondary" id="backToSkills">Orqaga</button>
+                        <button class="btn btn-primary" id="previewCv">Ko'rish</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button class="btn btn-success w-full sm:w-1/3 d-none" id="downloadPdf"><i class="fas fa-file-pdf"></i> PDF Yuklab Olish</button>
+            </div>
+        </section>
+    </div>
+    <div class="modal fade" id="cvPreviewModal" tabindex="-1" aria-labelledby="cvPreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cvPreviewModalLabel">CV Ko'rinishi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="cv-template mx-auto two-column" id="cv-preview">
+                        <div id="top-pattern" class="pattern-overlay pattern-top"></div>
+                        <div class="cv-header bg-blue-600 text-white p-4 text-center">
+                            <div class="cv-photo w-24 h-24 rounded-full mx-auto mb-2 overflow-hidden bg-gray-200">
+                                <img id="cv-photo-preview" src="" alt="Profil rasmi" class="w-full h-full object-cover" style="display: none;">
+                                <i class="fas fa-user text-4xl text-gray-400 flex items-center justify-center h-full"></i>
+                            </div>
+                            <h1 class="cv-name text-xl font-bold">Ism Familiya</h1>
+                            <h2 class="cv-title text-md opacity-90">Lavozim</h2>
+                        </div>
+                        <div class="cv-body">
+                            <div class="cv-left p-4">
+                                <div class="cv-section mb-4" data-section="summary">
+                                    <h3 class="cv-section-title">Ma'lumot</h3>
+                                    <p id="cv-summary" class="text-sm">Qisqacha ma'lumot kiritilmagan</p>
+                                </div>
+                                <div class="cv-section mb-4" data-section="experience">
+                                    <h3 class="cv-section-title">Tajriba</h3>
+                                    <div id="cv-experience" class="text-sm"></div>
+                                </div>
+                                <div class="cv-section mb-4" data-section="education">
+                                    <h3 class="cv-section-title">Ta'lim</h3>
+                                    <div id="cv-education" class="text-sm"></div>
+                                </div>
+                            </div>
+                            <div class="cv-right p-4">
+                                <div class="cv-section mb-4" data-section="contact">
+                                    <h3 class="cv-section-title">Aloqa</h3>
+                                    <div class="cv-contact-item flex mb-2">
+                                        <i class="fas fa-envelope text-blue-600 mr-2"></i>
+                                        <div id="cv-email">email@example.com</div>
+                                    </div>
+                                    <div class="cv-contact-item flex mb-2">
+                                        <i class="fas fa-phone text-blue-600 mr-2"></i>
+                                        <div id="cv-phone">+998901234567</div>
+                                    </div>
+                                    <div class="cv-contact-item flex mb-2">
+                                        <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
+                                        <div id="cv-address">Shahar, tuman</div>
+                                    </div>
+                                </div>
+                                <div class="cv-section mb-4" data-section="skills">
+                                    <h3 class="cv-section-title">Ko'nikmalar</h3>
+                                    <div id="cv-skills" class="text-sm"></div>
+                                </div>
+                                <div class="cv-section mb-4" data-section="languages">
+                                    <h3 class="cv-section-title">Tillar</h3>
+                                    <div id="cv-languages" class="text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="bottom-pattern" class="pattern-overlay pattern-bottom"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Qaytish</button>
+                    <button type="button" class="btn btn-success" id="downloadPdfModal"><i class="fas fa-file-pdf"></i> PDF Yuklab Olish</button>
+                    <button type="button" class="btn btn-secondary" id="downloadJpgModal"><i class="fas fa-file-image"></i> JPG Yuklab Olish</button>
+                    <button type="button" class="btn btn-info" id="downloadPngModal"><i class="fas fa-file-image"></i> PNG Yuklab Olish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="loader" id="pdfLoader"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const triggerDownload = (dataUrl, fileName, type) => {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        let sectionOrder = ['summary', 'experience', 'education', 'contact', 'skills', 'languages'];
+        let customization = {
+            fontFamily: 'Inter',
+            fontSize: 12,
+            fontColor: '#000000',
+            bgColor: '#ffffff',
+            headerBgColor: '#2563eb',
+            topPattern: '',
+            bottomPattern: '',
+            layout: 'two-column'
+        };
+        let expCounter = 1;
+        let eduCounter = 1;
+        let skillCounter = 1;
+        let langCounter = 1;
+        let isDarkMode = false;
+
+        const debounce = (func, wait) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        };
+
+        const saveFormData = () => {
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                jobTitle: document.getElementById('jobTitle').value,
+                summary: document.getElementById('summary').value,
+                photo: document.getElementById('cv-photo-preview').src,
+                email: document.getElementById('contact-email')?.value || '',
+                phone: document.getElementById('contact-phone')?.value || '',
+                address: document.getElementById('contact-address')?.value || '',
+                experiences: Array.from(document.querySelectorAll('.experience-item')).map(item => ({
+                    id: item.dataset.id,
+                    position: item.querySelector('.exp-position').value,
+                    company: item.querySelector('.exp-company').value,
+                    date: item.querySelector('.exp-date').value,
+                    description: item.querySelector('.exp-description').value
+                })),
+                educations: Array.from(document.querySelectorAll('.education-item')).map(item => ({
+                    id: item.dataset.id,
+                    degree: item.querySelector('.edu-degree').value,
+                    institution: item.querySelector('.edu-institution').value,
+                    date: item.querySelector('.edu-date').value,
+                    description: item.querySelector('.edu-description').value
+                })),
+                skills: Array.from(document.querySelectorAll('.skill-item')).map(item => ({
+                    id: item.dataset.id,
+                    name: item.querySelector('.skill-name').value,
+                    level: item.querySelector('.skill-level').value
+                })),
+                languages: Array.from(document.querySelectorAll('.language-item')).map(item => ({
+                    id: item.dataset.id,
+                    name: item.querySelector('.lang-name').value,
+                    level: item.querySelector('.lang-level').value
+                })),
+                sectionOrder,
+                customization,
+                isDarkMode
+            };
+            localStorage.setItem('cvFormData', JSON.stringify(formData));
+        };
+
+        const loadFormData = () => {
+            const formData = JSON.parse(localStorage.getItem('cvFormData'));
+            if (formData) {
+                document.getElementById('fullName').value = formData.fullName || '';
+                document.getElementById('jobTitle').value = formData.jobTitle || '';
+                document.getElementById('summary').value = formData.summary || '';
+                if (formData.photo) {
+                    document.getElementById('cv-photo-preview').src = formData.photo;
+                    document.getElementById('cv-photo-preview').style.display = 'block';
+                    document.getElementById('cv-photo-preview').nextElementSibling.style.display = 'none';
+                }
+                document.getElementById('contact-email').value = formData.email || '';
+                document.getElementById('contact-phone').value = formData.phone || '';
+                document.getElementById('contact-address').value = formData.address || '';
+
+                document.getElementById('experience-fields').innerHTML = '';
+                formData.experiences.forEach(exp => {
+                    const newExperience = document.createElement('div');
+                    newExperience.className = 'experience-item mb-4';
+                    newExperience.dataset.id = exp.id;
+                    newExperience.innerHTML = `
+                        <div class="mb-3"><label class="form-label">Lavozim *</label><input type="text" class="exp-position form-control" value="${exp.position}" placeholder="Masalan: Dasturchi" required></div>
+                        <div class="mb-3"><label class="form-label">Korxona *</label><input type="text" class="exp-company form-control" value="${exp.company}" placeholder="Korxona nomi" required></div>
+                        <div class="mb-3"><label class="form-label">Sana *</label><input type="text" class="exp-date form-control" value="${exp.date}" placeholder="Masalan: 2020 - 2023" required></div>
+                        <div class="mb-3"><label class="form-label">Tavsif</label><textarea class="exp-description form-control" placeholder="Ish tajribangiz haqida...">${exp.description}</textarea></div>
+                        <button class="btn btn-danger btn-sm remove-experience"><i class="fas fa-times"></i></button>
+                    `;
+                    document.getElementById('experience-fields').appendChild(newExperience);
+                    expCounter = Math.max(expCounter, parseInt(exp.id.split('-')[1]) + 1);
+                });
+
+                document.getElementById('education-fields').innerHTML = '';
+                formData.educations.forEach(edu => {
+                    const newEducation = document.createElement('div');
+                    newEducation.className = 'education-item mb-4';
+                    newEducation.dataset.id = edu.id;
+                    newEducation.innerHTML = `
+                        <div class="mb-3"><label class="form-label">Ta'lim darajasi *</label><input type="text" class="edu-degree form-control" value="${edu.degree}" placeholder="Masalan: Bakalavr" required></div>
+                        <div class="mb-3"><label class="form-label">O'quv muassasasi *</label><input type="text" class="edu-institution form-control" value="${edu.institution}" placeholder="Universitet nomi" required></div>
+                        <div class="mb-3"><label class="form-label">Sana *</label><input type="text" class="edu-date form-control" value="${edu.date}" placeholder="Masalan: 2016 - 2020" required></div>
+                        <div class="mb-3"><label class="form-label">Tavsif (ixtiyoriy)</label><textarea class="edu-description form-control" placeholder="Qo'shimcha ma'lumotlar...">${edu.description}</textarea></div>
+                        <button class="btn btn-danger btn-sm remove-education"><i class="fas fa-times"></i></button>
+                    `;
+                    document.getElementById('education-fields').appendChild(newEducation);
+                    eduCounter = Math.max(eduCounter, parseInt(edu.id.split('-')[1]) + 1);
+                });
+
+                document.getElementById('skill-fields').innerHTML = '';
+                formData.skills.forEach(skill => {
+                    const newSkill = document.createElement('div');
+                    newSkill.className = 'skill-item flex gap-3 mb-3 items-center';
+                    newSkill.dataset.id = skill.id;
+                    newSkill.innerHTML = `
+                        <input type="text" class="skill-name form-control flex-1" value="${skill.name}" placeholder="Ko'nikma nomi" required>
+                        <select class="skill-level form-select w-1/3">
+                            <option value="beginner" ${skill.level === 'beginner' ? 'selected' : ''}>Boshlang'ich</option>
+                            <option value="intermediate" ${skill.level === 'intermediate' ? 'selected' : ''}>O'rta</option>
+                            <option value="advanced" ${skill.level === 'advanced' ? 'selected' : ''}>Yuqori</option>
+                            <option value="expert" ${skill.level === 'expert' ? 'selected' : ''}>Expert</option>
+                        </select>
+                        <button class="btn btn-danger btn-sm remove-skill"><i class="fas fa-times"></i></button>
+                    `;
+                    document.getElementById('skill-fields').appendChild(newSkill);
+                    skillCounter = Math.max(skillCounter, parseInt(skill.id.split('-')[1]) + 1);
+                });
+
+                document.getElementById('language-fields').innerHTML = '';
+                formData.languages.forEach(lang => {
+                    const newLanguage = document.createElement('div');
+                    newLanguage.className = 'language-item flex gap-3 mb-3 items-center';
+                    newLanguage.dataset.id = lang.id;
+                    newLanguage.innerHTML = `
+                        <input type="text" class="lang-name form-control flex-1" value="${lang.name}" placeholder="Til nomi">
+                        <select class="lang-level form-select w-1/3">
+                            <option value="beginner" ${lang.level === 'beginner' ? 'selected' : ''}>Boshlang'ich</option>
+                            <option value="intermediate" ${lang.level === 'intermediate' ? 'selected' : ''}>O'rta</option>
+                            <option value="advanced" ${lang.level === 'advanced' ? 'selected' : ''}>Yuqori</option>
+                            <option value="native" ${lang.level === 'native' ? 'selected' : ''}>Ona tili</option>
+                        </select>
+                        <button class="btn btn-danger btn-sm remove-language"><i class="fas fa-times"></i></button>
+                    `;
+                    document.getElementById('language-fields').appendChild(newLanguage);
+                    langCounter = Math.max(langCounter, parseInt(lang.id.split('-')[1]) + 1);
+                });
+
+                sectionOrder = formData.sectionOrder || sectionOrder;
+                customization = formData.customization || customization;
+                isDarkMode = formData.isDarkMode;
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('toggleDarkMode').innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.getElementById('toggleDarkMode').innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                document.getElementById('layout-format').value = customization.layout;
+                document.getElementById('font-family').value = customization.fontFamily;
+                document.getElementById('font-size').value = customization.fontSize;
+                document.getElementById('font-color').value = customization.fontColor;
+                document.getElementById('bg-color').value = customization.bgColor;
+                document.getElementById('header-bg-color').value = customization.headerBgColor;
+                document.getElementById('top-pattern').value = customization.topPattern;
+                document.getElementById('bottom-pattern').value = customization.bottomPattern;
+                applyCustomizations();
+                updateSectionOrder();
+                updatePreview();
+            } else {
+                saveFormData();
+                updatePreview();
+            }
+        };
+
+        const updatePreview = () => {
+            const fullName = document.getElementById('fullName').value.trim();
+            const jobTitle = document.getElementById('jobTitle').value.trim();
+            const summary = document.getElementById('summary').value.trim();
+            const email = document.getElementById('contact-email')?.value.trim();
+            const phone = document.getElementById('contact-phone')?.value.trim();
+            const address = document.getElementById('contact-address')?.value.trim();
+
+            const cvName = document.querySelector('.cv-name');
+            const cvTitle = document.querySelector('.cv-title');
+            const cvSummary = document.getElementById('cv-summary');
+            const cvEmail = document.getElementById('cv-email');
+            const cvPhone = document.getElementById('cv-phone');
+            const cvAddress = document.getElementById('cv-address');
+
+            if (cvName) cvName.textContent = fullName || 'Ism Familiya';
+            if (cvTitle) cvTitle.textContent = jobTitle || 'Lavozim';
+            if (cvSummary) cvSummary.textContent = summary || 'Qisqacha ma\'lumot kiritilmagan';
+            if (cvEmail) cvEmail.textContent = email || 'email@example.com';
+            if (cvPhone) cvPhone.textContent = phone || '+998901234567';
+            if (cvAddress) cvAddress.textContent = address || 'Shahar, tuman';
+
+            const experienceItems = document.querySelectorAll('.experience-item');
+            const cvExperience = document.getElementById('cv-experience');
+            if (cvExperience) {
+                cvExperience.innerHTML = '';
+                if (experienceItems.length === 0) {
+                    cvExperience.innerHTML = '<p>Tajriba haqida ma\'lumot kiritilmagan</p>';
+                } else {
+                    experienceItems.forEach(item => {
+                        const position = item.querySelector('.exp-position').value.trim();
+                        const company = item.querySelector('.exp-company').value.trim();
+                        const date = item.querySelector('.exp-date').value.trim();
+                        const description = item.querySelector('.exp-description').value.trim();
+                        if (position || company || date) {
+                            cvExperience.innerHTML += `
+                                <div class="mb-3">
+                                    <div class="font-semibold">${position || 'Kiritilmagan'}</div>
+                                    <div class="text-gray-600">${company || 'Kiritilmagan'}</div>
+                                    <div class="text-blue-600 text-sm">${date || 'Kiritilmagan'}</div>
+                                    ${description ? `<p>${description}</p>` : ''}
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            const educationItems = document.querySelectorAll('.education-item');
+            const cvEducation = document.getElementById('cv-education');
+            if (cvEducation) {
+                cvEducation.innerHTML = '';
+                if (educationItems.length === 0) {
+                    cvEducation.innerHTML = '<p>Ta\'lim haqida ma\'lumot kiritilmagan</p>';
+                } else {
+                    educationItems.forEach(item => {
+                        const degree = item.querySelector('.edu-degree').value.trim();
+                        const institution = item.querySelector('.edu-institution').value.trim();
+                        const date = item.querySelector('.edu-date').value.trim();
+                        const description = item.querySelector('.edu-description').value.trim();
+                        if (degree || institution || date) {
+                            cvEducation.innerHTML += `
+                                <div class="mb-3">
+                                    <div class="font-semibold">${degree || 'Kiritilmagan'}</div>
+                                    <div class="text-gray-600">${institution || 'Kiritilmagan'}</div>
+                                    <div class="text-blue-600 text-sm">${date || 'Kiritilmagan'}</div>
+                                    ${description ? `<p>${description}</p>` : ''}
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            const skillItems = document.querySelectorAll('.skill-item');
+            const cvSkills = document.getElementById('cv-skills');
+            if (cvSkills) {
+                cvSkills.innerHTML = '';
+                if (skillItems.length === 0) {
+                    cvSkills.innerHTML = '<p>Ko\'nikmalar haqida ma\'lumot kiritilmagan</p>';
+                } else {
+                    skillItems.forEach(item => {
+                        const name = item.querySelector('.skill-name').value.trim();
+                        const level = item.querySelector('.skill-level').value;
+                        if (name) {
+                            let levelPercent = 0;
+                            switch (level) {
+                                case 'beginner': levelPercent = 25; break;
+                                case 'intermediate': levelPercent = 50; break;
+                                case 'advanced': levelPercent = 75; break;
+                                case 'expert': levelPercent = 100; break;
+                            }
+                            cvSkills.innerHTML += `
+                                <div class="mb-3">
+                                    <div class="flex justify-between mb-1">
+                                        <span>${name}</span>
+                                        <span>${levelPercent}%</span>
+                                    </div>
+                                    <div class="bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${levelPercent}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            const languageItems = document.querySelectorAll('.language-item');
+            const cvLanguages = document.getElementById('cv-languages');
+            if (cvLanguages) {
+                cvLanguages.innerHTML = '';
+                if (languageItems.length === 0) {
+                    cvLanguages.innerHTML = '<p>Tillar haqida ma\'lumot kiritilmagan</p>';
+                } else {
+                    languageItems.forEach(item => {
+                        const name = item.querySelector('.lang-name').value.trim();
+                        const level = item.querySelector('.lang-level').value;
+                        if (name) {
+                            let levelText = '';
+                            switch (level) {
+                                case 'beginner': levelText = 'Boshlang\'ich daraja'; break;
+                                case 'intermediate': levelText = 'O\'rta daraja'; break;
+                                case 'advanced': levelText = 'Yuqori daraja'; break;
+                                case 'native': levelText = 'Ona tili'; break;
+                            }
+                            cvLanguages.innerHTML += `
+                                <div class="mb-2">
+                                    <span class="font-semibold">${name}</span>
+                                    <span class="text-gray-600"> ${levelText}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+        };
+
+        const debouncedUpdatePreview = debounce(updatePreview, 300);
+
+        const applyCustomizations = () => {
+            const cvPreview = document.getElementById('cv-preview');
+            cvPreview.className = `cv-template mx-auto ${customization.layout}`;
+            cvPreview.style.backgroundColor = customization.bgColor;
+            cvPreview.style.fontFamily = customization.fontFamily;
+            cvPreview.style.fontSize = `${customization.fontSize}px`;
+            cvPreview.style.color = customization.fontColor;
+            const header = document.querySelector('.cv-header');
+            if (header) {
+                header.style.background = customization.headerBgColor;
+                header.classList.remove('bg-blue-600', 'bg-gray-800', 'bg-gradient-to-r', 'from-purple-500', 'to-pink-600', 'bg-blue-900');
+            }
+            const body = document.querySelector('.cv-body');
+            if (body) {
+                body.style.backgroundColor = customization.bgColor;
+            }
+            const topPattern = document.getElementById('top-pattern');
+            const bottomPattern = document.getElementById('bottom-pattern');
+            if (topPattern) topPattern.style.backgroundImage = customization.topPattern;
+            if (bottomPattern) bottomPattern.style.backgroundImage = customization.bottomPattern;
+            const sectionTitles = document.querySelectorAll('.cv-section-title');
+            sectionTitles.forEach(title => {
+                title.style.color = customization.headerBgColor;
+                title.style.borderBottomColor = customization.headerBgColor;
+            });
+            adjustCvScale();
+        };
+
+        const adjustCvScale = () => {
+            const cvPreview = document.getElementById('cv-preview');
+            const windowWidth = window.innerWidth;
+            let scale = 0.9;
+            if (windowWidth <= 768) {
+                scale = 0.8;
+            }
+            if (windowWidth <= 480) {
+                scale = 0.65;
+            }
+            cvPreview.style.transform = `scale(${scale})`;
+            cvPreview.style.width = '100%';
+            cvPreview.style.maxWidth = '595px';
+        };
+
+        const applyPreset = (preset) => {
+            if (preset === 'professional') {
+                customization = {
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    fontColor: '#000000',
+                    bgColor: '#ffffff',
+                    headerBgColor: '#2563eb',
+                    topPattern: '',
+                    bottomPattern: '',
+                    layout: customization.layout
+                };
+            } else if (preset === 'minimal') {
+                customization = {
+                    fontFamily: 'Arial',
+                    fontSize: 11,
+                    fontColor: '#333333',
+                    bgColor: '#f9fafb',
+                    headerBgColor: '#4b5563',
+                    topPattern: '',
+                    bottomPattern: '',
+                    layout: customization.layout
+                };
+            } else if (preset === 'vibrant') {
+                customization = {
+                    fontFamily: 'Roboto',
+                    fontSize: 13,
+                    fontColor: '#1f2937',
+                    bgColor: '#fefcbf',
+                    headerBgColor: '#ec4899',
+                    topPattern: 'url(https://www.toptal.com/designers/subtlepatterns/uploads/wave.png)',
+                    bottomPattern: 'url(https://www.toptal.com/designers/subtlepatterns/uploads/wave.png)',
+                    layout: customization.layout
+                };
+            } else if (preset === 'elegant') {
+                customization = {
+                    fontFamily: 'Georgia',
+                    fontSize: 12,
+                    fontColor: '#1e3a8a',
+                    bgColor: '#eff6ff',
+                    headerBgColor: '#1e40af',
+                    topPattern: 'url(https://www.toptal.com/designers/subtlepatterns/uploads/diamond.png)',
+                    bottomPattern: '',
+                    layout: customization.layout
+                };
+            }
+            document.getElementById('font-family').value = customization.fontFamily;
+            document.getElementById('font-size').value = customization.fontSize;
+            document.getElementById('font-color').value = customization.fontColor;
+            document.getElementById('bg-color').value = customization.bgColor;
+            document.getElementById('header-bg-color').value = customization.headerBgColor;
+            document.getElementById('top-pattern').value = customization.topPattern;
+            document.getElementById('bottom-pattern').value = customization.bottomPattern;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        };
+
+        const updateSectionOrder = () => {
+            const cvLeft = document.querySelector('.cv-left');
+            const cvRight = document.querySelector('.cv-right');
+            if (!cvLeft || !cvRight) return;
+
+            const sectionElements = {};
+            sectionOrder.forEach(section => {
+                const sectionEl = document.querySelector(`[data-section="${section}"]`);
+                if (sectionEl) {
+                    sectionElements[section] = sectionEl;
+                }
+            });
+
+            cvLeft.innerHTML = '';
+            cvRight.innerHTML = '';
+
+            sectionOrder.forEach(section => {
+                const sectionEl = sectionElements[section];
+                if (sectionEl) {
+                    if (customization.layout === 'one-column') {
+                        cvLeft.appendChild(sectionEl);
+                    } else {
+                        if (['summary', 'experience', 'education'].includes(section)) {
+                            cvLeft.appendChild(sectionEl);
+                        } else {
+                            cvRight.appendChild(sectionEl);
+                        }
+                    }
+                }
+            });
+
+            debouncedUpdatePreview();
+        };
+
+        document.getElementById('toggleDarkMode').addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('toggleDarkMode').innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            saveFormData();
+        });
+
+        document.querySelectorAll('input:not([type="file"]), textarea, select').forEach(input => {
+            input.addEventListener('input', saveFormData);
+            input.addEventListener('input', debouncedUpdatePreview);
+        });
+
+        document.getElementById('font-family').addEventListener('change', (e) => {
+            customization.fontFamily = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('font-size').addEventListener('input', (e) => {
+            customization.fontSize = parseInt(e.target.value);
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('font-color').addEventListener('input', (e) => {
+            customization.fontColor = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('bg-color').addEventListener('input', (e) => {
+            customization.bgColor = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('header-bg-color').addEventListener('input', (e) => {
+            customization.headerBgColor = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('top-pattern').addEventListener('change', (e) => {
+            customization.topPattern = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('bottom-pattern').addEventListener('change', (e) => {
+            customization.bottomPattern = e.target.value;
+            applyCustomizations();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.getElementById('layout-format').addEventListener('change', (e) => {
+            customization.layout = e.target.value;
+            applyCustomizations();
+            updateSectionOrder();
+            saveFormData();
+            updatePreview();
+        });
+
+        document.querySelectorAll('.preset-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.preset-option').forEach(opt => opt.classList.remove('bg-blue-100'));
+                option.classList.add('bg-blue-100');
+                applyPreset(option.dataset.preset);
+            });
+        });
+
+        let draggedSection = null;
+        document.querySelectorAll('.cv-section').forEach(section => {
+            section.draggable = true;
+            section.addEventListener('dragstart', (e) => {
+                draggedSection = section.dataset.section;
+                section.classList.add('dragging');
+            });
+            section.addEventListener('dragend', () => {
+                section.classList.remove('dragging');
+                draggedSection = null;
+            });
+            section.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            section.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const targetSection = section.dataset.section;
+                const draggedIndex = sectionOrder.indexOf(draggedSection);
+                const targetIndex = sectionOrder.indexOf(targetSection);
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    sectionOrder.splice(draggedIndex, 1);
+                    sectionOrder.splice(targetIndex, 0, draggedSection);
+                    updateSectionOrder();
+                    saveFormData();
+                }
+            });
+        });
+
+        document.getElementById('add-experience').addEventListener('click', () => {
+            const experienceFields = document.getElementById('experience-fields');
+            const newExperience = document.createElement('div');
+            newExperience.className = 'experience-item mb-4';
+            newExperience.dataset.id = `exp-${expCounter++}`;
+            newExperience.innerHTML = `
+                <div class="mb-3"><label class="form-label">Lavozim *</label><input type="text" class="exp-position form-control" placeholder="Masalan: Dasturchi" required></div>
+                <div class="mb-3"><label class="form-label">Korxona *</label><input type="text" class="exp-company form-control" placeholder="Korxona nomi" required></div>
+                <div class="mb-3"><label class="form-label">Sana *</label><input type="text" class="exp-date form-control" placeholder="Masalan: 2020 - 2023" required></div>
+                <div class="mb-3"><label class="form-label">Tavsif</label><textarea class="exp-description form-control" placeholder="Ish tajribangiz haqida..."></textarea></div>
+                <button class="btn btn-danger btn-sm remove-experience"><i class="fas fa-times"></i></button>
+            `;
+            experienceFields.appendChild(newExperience);
+            newExperience.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', saveFormData);
+                input.addEventListener('input', debouncedUpdatePreview);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-experience')) {
+                const experienceItem = e.target.closest('.experience-item');
+                experienceItem.classList.add('d-none');
+                setTimeout(() => {
+                    experienceItem.remove();
+                    saveFormData();
+                    debouncedUpdatePreview();
+                }, 300);
+            }
+        });
+
+        document.getElementById('add-education').addEventListener('click', () => {
+            const educationFields = document.getElementById('education-fields');
+            const newEducation = document.createElement('div');
+            newEducation.className = 'education-item mb-4';
+            newEducation.dataset.id = `edu-${eduCounter++}`;
+            newEducation.innerHTML = `
+                <div class="mb-3"><label class="form-label">Ta'lim darajasi *</label><input type="text" class="edu-degree form-control" placeholder="Masalan: Bakalavr" required></div>
+                <div class="mb-3"><label class="form-label">O'quv muassasasi *</label><input type="text" class="edu-institution form-control" placeholder="Universitet nomi" required></div>
+                <div class="mb-3"><label class="form-label">Sana *</label><input type="text" class="edu-date form-control" placeholder="Masalan: 2016 - 2020" required></div>
+                <div class="mb-3"><label class="form-label">Tavsif (ixtiyoriy)</label><textarea class="edu-description form-control" placeholder="Qo'shimcha ma'lumotlar..."></textarea></div>
+                <button class="btn btn-danger btn-sm remove-education"><i class="fas fa-times"></i></button>
+            `;
+            educationFields.appendChild(newEducation);
+            newEducation.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', saveFormData);
+                input.addEventListener('input', debouncedUpdatePreview);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-education')) {
+                const educationItem = e.target.closest('.education-item');
+                educationItem.classList.add('d-none');
+                setTimeout(() => {
+                    educationItem.remove();
+                    saveFormData();
+                    debouncedUpdatePreview();
+                }, 300);
+            }
+        });
+
+        document.getElementById('add-skill').addEventListener('click', () => {
+            const skillFields = document.getElementById('skill-fields');
+            const newSkill = document.createElement('div');
+            newSkill.className = 'skill-item flex gap-3 mb-3 items-center';
+            newSkill.dataset.id = `skill-${skillCounter++}`;
+            newSkill.innerHTML = `
+                <input type="text" class="skill-name form-control flex-1" placeholder="Ko'nikma nomi" required>
+                <select class="skill-level form-select w-1/3">
+                    <option value="beginner">Boshlang'ich</option>
+                    <option value="intermediate">O'rta</option>
+                    <option value="advanced">Yuqori</option>
+                    <option value="expert">Expert</option>
+                </select>
+                <button class="btn btn-danger btn-sm remove-skill"><i class="fas fa-times"></i></button>
+            `;
+            skillFields.appendChild(newSkill);
+            newSkill.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', saveFormData);
+                input.addEventListener('input', debouncedUpdatePreview);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-skill')) {
+                const skillItem = e.target.closest('.skill-item');
+                skillItem.classList.add('d-none');
+                setTimeout(() => {
+                    skillItem.remove();
+                    saveFormData();
+                    debouncedUpdatePreview();
+                }, 300);
+            }
+        });
+
+        document.getElementById('add-language').addEventListener('click', () => {
+            const languageFields = document.getElementById('language-fields');
+            const newLanguage = document.createElement('div');
+            newLanguage.className = 'language-item flex gap-3 mb-3 items-center';
+            newLanguage.dataset.id = `lang-${langCounter++}`;
+            newLanguage.innerHTML = `
+                <input type="text" class="lang-name form-control flex-1" placeholder="Til nomi">
+                <select class="lang-level form-select w-1/3">
+                    <option value="beginner">Boshlang'ich</option>
+                    <option value="intermediate">O'rta</option>
+                    <option value="advanced">Yuqori</option>
+                    <option value="native">Ona tili</option>
+                </select>
+                <button class="btn btn-danger btn-sm remove-language"><i class="fas fa-times"></i></button>
+            `;
+            languageFields.appendChild(newLanguage);
+            newLanguage.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', saveFormData);
+                input.addEventListener('input', debouncedUpdatePreview);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-language')) {
+                const languageItem = e.target.closest('.language-item');
+                languageItem.classList.add('d-none');
+                setTimeout(() => {
+                    languageItem.remove();
+                    saveFormData();
+                    debouncedUpdatePreview();
+                }, 300);
+            }
+        });
+
+        document.getElementById('photo').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                    alert('Faqat JPEG yoki PNG formatdagi rasmlar qabul qilinadi!');
+                    e.target.value = '';
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Rasm hajmi 2MB dan kichik bo\'lishi kerak!');
+                    e.target.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('cv-photo-preview').src = event.target.result;
+                    document.getElementById('cv-photo-preview').style.display = 'block';
+                    document.getElementById('cv-photo-preview').nextElementSibling.style.display = 'none';
+                    saveFormData();
+                    debouncedUpdatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        const validateEmail = (email) => {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        const validatePhone = (phone) => {
+            return /^\+998\d{9}$/.test(phone);
+        };
+
+        const validateDate = (date) => {
+            return date.trim().length > 0;
+        };
+
+        const validateFields = (sectionId) => {
+            let isValid = true;
+            const inputs = document.querySelectorAll(`#${sectionId} [required]`);
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('border-danger');
+                    isValid = false;
+                } else {
+                    input.classList.remove('border-danger');
+                    if (input.id === 'contact-email' && !validateEmail(input.value)) {
+                        input.classList.add('border-danger');
+                        isValid = false;
+                    } else if (input.id === 'contact-phone' && !validatePhone(input.value)) {
+                        input.classList.add('border-danger');
+                        isValid = false;
+                    } else if (input.classList.contains('exp-date') && !validateDate(input.value)) {
+                        input.classList.add('border-danger');
+                        isValid = false;
+                    } else if (input.classList.contains('edu-date') && !validateDate(input.value)) {
+                        input.classList.add('border-danger');
+                        isValid = false;
+                    }
+                }
+            });
+            return isValid;
+        };
+
+        const validateAllFields = () => {
+            let isValid = true;
+            ['basic-section', 'experience-section', 'education-section', 'skills-section'].forEach(sectionId => {
+                if (!validateFields(sectionId)) {
+                    isValid = false;
+                }
+            });
+            return isValid;
+        };
+
+        const showErrorAlert = () => {
+            const errorAlert = document.getElementById('errorAlert');
+            if (errorAlert) {
+                errorAlert.classList.remove('d-none');
+                setTimeout(() => errorAlert.classList.add('d-none'), 3000);
+            }
+        };
+
+        const navigateToSection = (sectionId) => {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            document.getElementById(sectionId).classList.remove('d-none');
+        };
+
+        document.getElementById('nextToExperience').addEventListener('click', () => {
+            if (validateFields('basic-section')) {
+                navigateToSection('experience-section');
+            } else {
+                showErrorAlert();
+            }
+        });
+
+        document.getElementById('backToBasic').addEventListener('click', () => {
+            navigateToSection('basic-section');
+        });
+
+        document.getElementById('nextToEducation').addEventListener('click', () => {
+            if (validateFields('experience-section')) {
+                navigateToSection('education-section');
+            } else {
+                showErrorAlert();
+            }
+        });
+
+        document.getElementById('backToExperience').addEventListener('click', () => {
+            navigateToSection('experience-section');
+        });
+
+        document.getElementById('nextToSkills').addEventListener('click', () => {
+            if (validateFields('education-section')) {
+                navigateToSection('skills-section');
+            } else {
+                showErrorAlert();
+            }
+        });
+
+        document.getElementById('backToEducation').addEventListener('click', () => {
+            navigateToSection('education-section');
+        });
+
+        document.getElementById('nextToCustomize').addEventListener('click', () => {
+            if (validateFields('skills-section')) {
+                navigateToSection('customize-section');
+            } else {
+                showErrorAlert();
+            }
+        });
+
+        document.getElementById('backToSkills').addEventListener('click', () => {
+            navigateToSection('skills-section');
+        });
+
+        document.getElementById('previewCv').addEventListener('click', () => {
+            if (!validateAllFields()) {
+                showErrorAlert();
+                return;
+            }
+            updatePreview();
+            const modal = new bootstrap.Modal(document.getElementById('cvPreviewModal'));
+            modal.show();
+            document.getElementById('downloadPdf').classList.remove('d-none');
+            document.getElementById('successAlert').classList.remove('d-none');
+            setTimeout(() => document.getElementById('successAlert').classList.add('d-none'), 3000);
+        });
+
+        const downloadCv = (format) => {
+            if (!validateAllFields()) {
+                showErrorAlert();
+                return;
+            }
+            document.getElementById('pdfLoader').style.display = 'block';
+            const fullName = document.getElementById('fullName').value.trim() || 'CV';
+            const cvPreview = document.getElementById('cv-preview');
+
+            cvPreview.style.transform = 'scale(1)';
+            cvPreview.style.width = '210mm';
+            cvPreview.style.height = 'auto';
+
+            if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('portrait', 'mm', 'a4', true);
+                html2canvas(cvPreview, {
+                    scale: 2,
+                    dpi: 300,
+                    useCORS: true,
+                    allowTaint: false,
+                    width: 595,
+                    height: cvPreview.offsetHeight
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    const imgWidth = 210;
+                    const imgHeight = (canvas.height / canvas.width) * imgWidth;
+                    doc.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    triggerDownload(pdfUrl, `${fullName}.pdf`, 'application/pdf');
+                    URL.revokeObjectURL(pdfUrl);
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    document.getElementById('successAlert').classList.remove('d-none');
+                    setTimeout(() => document.getElementById('successAlert').classList.add('d-none'), 3000);
+                    adjustCvScale();
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    alert('PDF yaratishda xatolik yuz berdi!');
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    adjustCvScale();
+                });
+            } else if (format === 'jpg') {
+                html2canvas(cvPreview, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    width: 595,
+                    height: cvPreview.offsetHeight
+                }).then(canvas => {
+                    const jpgUrl = canvas.toDataURL('image/jpeg', 1.0);
+                    triggerDownload(jpgUrl, `${fullName}.jpg`, 'image/jpeg');
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    document.getElementById('successAlert').classList.remove('d-none');
+                    setTimeout(() => document.getElementById('successAlert').classList.add('d-none'), 3000);
+                    adjustCvScale();
+                }).catch(error => {
+                    console.error('Error generating JPG:', error);
+                    alert('JPG yaratishda xatolik yuz berdi!');
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    adjustCvScale();
+                });
+            } else if (format === 'png') {
+                html2canvas(cvPreview, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    width: 595,
+                    height: cvPreview.offsetHeight
+                }).then(canvas => {
+                    const pngUrl = canvas.toDataURL('image/png', 1.0);
+                    triggerDownload(pngUrl, `${fullName}.png`, 'image/png');
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    document.getElementById('successAlert').classList.remove('d-none');
+                    setTimeout(() => document.getElementById('successAlert').classList.add('d-none'), 3000);
+                    adjustCvScale();
+                }).catch(error => {
+                    console.error('Error generating PNG:', error);
+                    alert('PNG yaratishda xatolik yuz berdi!');
+                    document.getElementById('pdfLoader').style.display = 'none';
+                    adjustCvScale();
+                });
+            }
+        };
+
+        document.getElementById('downloadPdf').addEventListener('click', () => downloadCv('pdf'));
+        document.getElementById('downloadPdfModal').addEventListener('click', () => downloadCv('pdf'));
+        document.getElementById('downloadJpgModal').addEventListener('click', () => downloadCv('jpg'));
+        document.getElementById('downloadPngModal').addEventListener('click', () => downloadCv('png'));
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            tg.enableClosingConfirmation();
+            document.body.style.backgroundColor = tg.themeParams.bg_color || '#ffffff';
+            document.querySelectorAll('button.btn').forEach(btn => {
+                btn.style.backgroundColor = tg.themeParams.button_color || '#3b82f6';
+                btn.style.color = tg.themeParams.button_text_color || '#ffffff';
+            });
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('fullName').value = `${user.first_name} ${user.last_name || ''}`.trim();
+                debouncedUpdatePreview();
+            }
+        }
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.removeItem('cvFormData');
+        });
+
+        window.addEventListener('load', () => {
+            loadFormData();
+            adjustCvScale();
+        });
+
+        window.addEventListener('resize', adjustCvScale);
+    </script>
+</body>
+</html>
